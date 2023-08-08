@@ -2,6 +2,7 @@
 /* eslint-disable import/prefer-default-export */
 import User from '../models/Users.js';
 import idGenerate from '../helpers/idGenetate.js';
+import generateJWT from '../helpers/generateJWT.js';
 
 const userControllerRegister = async (req, res) => {
   console.log(req.body);
@@ -41,6 +42,7 @@ const authenticate = async (req, res) => {
     res.json({
       _id: user._id,
       email: user.email,
+      token: generateJWT(user._id),
     });
   } else {
     const error = new Error('Incorrect password, please try again');
@@ -48,4 +50,22 @@ const authenticate = async (req, res) => {
   }
 };
 
-export { userControllerRegister, authenticate };
+const userConfirm = async (req, res) => {
+  const { token } = req.params;
+  const userConfirmed = await await User.findOne({ token });
+  if (userConfirmed) {
+    try {
+      userConfirmed.confirm = true;
+      userConfirmed.token = null;
+      await userConfirmed.save();
+      res.status(200).json({ msj: 'Success, user has been confirmed' });
+    } catch (error) {
+      res.status(500).json({ msj: 'Internal error, please try again later' });
+    }
+  } else {
+    const error = new Error('User no found');
+    return res.status(403).json({ msj: error.message });
+  }
+};
+
+export { userControllerRegister, authenticate, userConfirm };
