@@ -1,9 +1,10 @@
 import express from 'express';
-import { usersControllerGet, userControllerPost } from '../controllers/userController.js';
+import { userControllerRegister, authenticate } from '../controllers/userController.js';
 
-const userRouter = express.Router();
+const Router = express.Router();
 
-userRouter.get('/', usersControllerGet);
-userRouter.post('/', userControllerPost);
+// to autenticate create and confirm users
+Router.post('/', userControllerRegister);
+Router.post('/login', authenticate);
 
-export default userRouter;
+export default Router;

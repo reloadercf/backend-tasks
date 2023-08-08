@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import bcrypt from 'bcrypt';
 
 const userSchema = mongoose.Schema({
   name: {
@@ -27,6 +28,20 @@ const userSchema = mongoose.Schema({
 }, {
   timestamps: true,
 });
+
+userSchema.pre('save', async function (next) {
+  // middleware to skip hash password if update some of account
+  if (!this.isModified('password')) {
+    next();
+  }
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+});
+
+userSchema.methods.verifyPassword = async function (passwordForm) {
+  const isCorrect = await bcrypt.compare(passwordForm, this.password);
+  return isCorrect;
+};
 
 const User = mongoose.model('User', userSchema);
 

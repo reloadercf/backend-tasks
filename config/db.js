@@ -5,6 +5,7 @@ const conectDB = async () => {
     const conetion = await mongoose.connect(process.env.MONGO_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
+      dbName: 'uptask',
     });
     const url = `${conetion.connection.host}:${conetion.connection.port}`;
     console.log('you are connected in', url);
