@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable import/prefer-default-export */
 import User from '../models/Users.js';
@@ -5,7 +6,6 @@ import idGenerate from '../helpers/idGenetate.js';
 import generateJWT from '../helpers/generateJWT.js';
 
 const userControllerRegister = async (req, res) => {
-  console.log(req.body);
   const { email } = req.body;
   const existUser = await User.findOne({ email });
 
@@ -68,4 +68,53 @@ const userConfirm = async (req, res) => {
   }
 };
 
-export { userControllerRegister, authenticate, userConfirm };
+const forgetPassword = async (req, res) => {
+  const { email } = req.body;
+  // to verify user existUser
+  const user = await User.findOne({ email });
+  if (!user) {
+    const error = new Error("User don't exist");
+    return res.status(404).json({ msj: error.message });
+  }
+  try {
+    user.token = idGenerate();
+    await user.save();
+    res.json({ msj: 'We send mail with the instructions, please open your email and change password' });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const verifyToken = async (req, res) => {
+  const { token } = req.params;
+  const isValidToken = await User.findOne({ token });
+  if (isValidToken) {
+    res.status(200).json({ ms: 'Success' });
+  } else {
+    const error = new Error('Invalid token');
+    return res.status(404).json({ msj: error.message });
+  }
+};
+
+const changePassword = async (req, res) => {
+  const { token } = req.params;
+  const { password } = req.body;
+  const isUser = await User.findOne({ token });
+  if (isUser) {
+    isUser.password = password;
+    isUser.token = null;
+    try {
+      await isUser.save();
+      res.json({ msj: 'Password was changed successful' });
+    } catch (error) {
+      console.log(error);
+    }
+  } else {
+    const error = new Error('Invalid change, please try again');
+    res.status(404).json({ msg: error.message });
+  }
+};
+
+export {
+  userControllerRegister, authenticate, userConfirm, forgetPassword, verifyToken, changePassword,
+};
