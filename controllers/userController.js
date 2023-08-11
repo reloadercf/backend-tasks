@@ -115,6 +115,11 @@ const changePassword = async (req, res) => {
   }
 };
 
+export const profile = (req, res) => {
+  console.log('from profile');
+};
+
 export {
   userControllerRegister, authenticate, userConfirm, forgetPassword, verifyToken, changePassword,
+  profile,
 };
