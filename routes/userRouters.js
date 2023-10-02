@@ -7,13 +7,16 @@ import checkAuth from '../middleware/checkAuth.js';
 
 const Router = express.Router();
 
-// to autenticate create and confirm users
+/**
+ * To autenticación create and confirm users
+ * This section of code is allowed access public */
+
 Router.post('/', userControllerRegister);
 Router.post('/login', authenticate);
 Router.get('/confirm/:token', userConfirm);
 Router.get('/forget-password', forgetPassword);
 Router.route('/forget-password/:token').get(verifyToken).post(changePassword);
 
-Router.get('/perfil', checkAuth, profile);
+Router.get('/profile', checkAuth, profile);
 
 export default Router;

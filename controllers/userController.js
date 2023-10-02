@@ -99,12 +99,12 @@ const verifyToken = async (req, res) => {
 const changePassword = async (req, res) => {
   const { token } = req.params;
   const { password } = req.body;
-  const isUser = await User.findOne({ token });
-  if (isUser) {
-    isUser.password = password;
-    isUser.token = null;
+  const isFoundUser = await User.findOne({ token });
+  if (isFoundUser) {
+    isFoundUser.password = password;
+    isFoundUser.token = null;
     try {
-      await isUser.save();
+      await isFoundUser.save();
       res.json({ msj: 'Password was changed successful' });
     } catch (error) {
       console.log(error);
@@ -115,8 +115,9 @@ const changePassword = async (req, res) => {
   }
 };
 
-export const profile = (req, res) => {
-  console.log('from profile');
+const profile = async (req, res) => {
+  const { UserLogged } = req;
+  res.json(UserLogged);
 };
 
 export {
