@@ -47,11 +47,51 @@ export const getTask = async (req, res) => {
 };
 
 export const updateTask = async (req, res) => {
+  const { id } = req.params;
 
+  const task = await Task.findById(id).populate('project');
+
+  if (!task) {
+    const error = new Error('Task no found');
+    return res.status(404).json({ message: error.message });
+  }
+
+  if (task.project.author.toString() !== req.UserLogged._id.toString()) {
+    const error = new Error('Action no allowed');
+    return res.status(403).json({ message: error.message });
+  }
+  task.nameTask = req.body.nameTask || task.nameTask;
+  task.description = req.body.description || task.description;
+  task.priority = req.body.priority || task.priority;
+  task.dataDelivery = req.body.dataDelivery || task.dataDelivery;
+  try {
+    const taskSaved = await task.save();
+    res.json(taskSaved);
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal server error' });
+  }
 };
 
 export const deleteTask = async (req, res) => {
+  try {
+    const { id } = req.params;
 
+    const task = await Task.findById(id).populate('project');
+
+    if (!task) {
+      const error = new Error('Task no found');
+      return res.status(404).json({ message: error.message });
+    }
+
+    if (task.project.author.toString() !== req.UserLogged._id.toString()) {
+      const error = new Error('Action no allowed');
+      return res.status(403).json({ message: error.message });
+    }
+    await task.deleteOne();
+    res.json({ message: 'Task has been deleted' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal server error' });
+  }
 };
 
 export const changeStatusTask = async (req, res) => {
