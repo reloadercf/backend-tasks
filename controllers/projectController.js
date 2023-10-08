@@ -1,6 +1,7 @@
 /* eslint-disable consistent-return */
 /* eslint-disable no-underscore-dangle */
 import Project from '../models/Project.js';
+import Task from '../models/Task.js';
 
 export const getAllProjectsUser = async (req, res) => {
   const projects = await Project.find().where('author').equals(req.UserLogged);
@@ -29,7 +30,11 @@ export const getProject = async (req, res) => {
     if (project.author.toString() !== req.UserLogged._id.toString()) {
       return res.status(404).json({ message: 'Access denied, user does not have permissions' });
     }
-    res.json(project);
+
+    // Add element to serializer with tasks
+    const tasks = await Task.find().where('project').equals(project._id);
+
+    res.json({ project, tasks });
   } catch (error) {
     return res.status(500).json({ message: 'Internal server error' });
   }
@@ -80,9 +85,5 @@ export const addPartner = async (req, res) => {
 };
 
 export const deletePartner = async (req, res) => {
-
-};
-
-export const getTasks = async (req, res) => {
 
 };
