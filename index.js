@@ -1,5 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import cors from 'cors';
+
 import conectDB from './config/db.js';
 import userRouter from './routes/userRouters.js';
 import projectRouter from './routes/projectRouters.js';
@@ -9,6 +11,21 @@ const app = express();
 app.use(express.json());
 dotenv.config();
 conectDB();
+
+// To connect from frontend
+const allowedHost = ['http://localhost:5173'];
+
+const corsSettings = {
+  origin: (origin, callback) => {
+    if (allowedHost.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('You has been blocked by CORS policy'));
+    }
+  },
+};
+
+app.use(cors(corsSettings));
 
 // Create router
 app.use('/api/users', userRouter);
