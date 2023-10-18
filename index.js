@@ -13,7 +13,7 @@ dotenv.config();
 conectDB();
 
 // To connect from frontend
-const allowedHost = ['http://localhost:5173'];
+const allowedHost = ['http://localhost:5173', 'render.com'];
 
 const corsSettings = {
   origin: (origin, callback) => {

@@ -17,7 +17,11 @@ const userControllerRegister = async (req, res) => {
     const user = new User(req.body);
     user.token = idGenerate();
     const userSavedDB = await user.save();
-    res.json(userSavedDB);
+    res.json({
+      msj: 'User has been created successful!, we send mail to confirm your account',
+      error: false,
+      response: userSavedDB,
+    });
   } catch (error) {
     console.log(error);
   }
