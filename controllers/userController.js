@@ -4,6 +4,7 @@
 import User from '../models/Users.js';
 import idGenerate from '../helpers/idGenetate.js';
 import generateJWT from '../helpers/generateJWT.js';
+import { emailRegister } from '../helpers/email.js';
 
 const userControllerRegister = async (req, res) => {
   const { email } = req.body;
@@ -17,13 +18,20 @@ const userControllerRegister = async (req, res) => {
     const user = new User(req.body);
     user.token = idGenerate();
     const userSavedDB = await user.save();
+    // send email to confirm account
+    emailRegister({
+      email: userSavedDB.email,
+      name: userSavedDB.name,
+      token: userSavedDB.token,
+    });
+
     res.json({
       msj: 'User has been created successful!, we send mail to confirm your account',
       error: false,
       response: userSavedDB,
     });
   } catch (error) {
-    console.log(error);
+    res.status(400).json({ msj: 'Server error' });
   }
 };
 
@@ -67,7 +75,7 @@ const userConfirm = async (req, res) => {
       res.status(500).json({ msj: 'Internal error, please try again later' });
     }
   } else {
-    const error = new Error('User no found');
+    const error = new Error('Confirmation no found');
     return res.status(403).json({ msj: error.message });
   }
 };
