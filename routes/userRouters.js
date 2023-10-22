@@ -14,7 +14,7 @@ const Router = express.Router();
 Router.post('/', userControllerRegister);
 Router.post('/login', authenticate);
 Router.get('/confirm/:token', userConfirm);
-Router.get('/forget-password', forgetPassword);
+Router.post('/forget-password', forgetPassword);
 Router.route('/forget-password/:token').get(verifyToken).post(changePassword);
 
 Router.get('/profile', checkAuth, profile);
