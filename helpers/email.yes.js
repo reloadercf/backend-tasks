@@ -3,17 +3,15 @@ import nodemailer from 'nodemailer';
 export const emailRegister = async (dataRegister) => {
   const { email, name, token } = dataRegister;
   const transport = nodemailer.createTransport({
-    service: 'gmail',
-    // host: 'smtp.gmail.com',
-    port: 587,
-    secure: false,
+    host: 'smtp.mailtrap.io',
+    port: 2525,
     auth: {
       user: `${process.env.USERMAIL}`,
       pass: `${process.env.PASSMAIL}`,
     },
   });
   const info = transport.sendMail({
-    from: `${process.env.USERMAIL}`,
+    from: 'mxcodemexico@gmail.com',
     to: email,
     subject: 'Confirm your account',
     text: 'If you no are a robot, confirm your account',
