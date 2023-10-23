@@ -1,10 +1,10 @@
 /* eslint-disable consistent-return */
 /* eslint-disable no-underscore-dangle */
-/* eslint-disable import/prefer-default-export */
 import User from '../models/Users.js';
 import idGenerate from '../helpers/idGenetate.js';
 import generateJWT from '../helpers/generateJWT.js';
-import { emailRegister } from '../helpers/email.js';
+import senderEmail from '../helpers/email.js';
+import messagesEmail from '../helpers/messagesEmail.js';
 
 const userControllerRegister = async (req, res) => {
   const { email } = req.body;
@@ -19,11 +19,11 @@ const userControllerRegister = async (req, res) => {
     user.token = idGenerate();
     const userSavedDB = await user.save();
     // send email to confirm account
-    emailRegister({
+    senderEmail({
       email: userSavedDB.email,
       name: userSavedDB.name,
       token: userSavedDB.token,
-    });
+    }, messagesEmail.confirm);
 
     res.json({
       msj: 'User has been created successful!, we send mail to confirm your account',
@@ -91,9 +91,15 @@ const forgetPassword = async (req, res) => {
   try {
     user.token = idGenerate();
     await user.save();
+    senderEmail({
+      email: user.email,
+      name: user.name,
+      token: user.token,
+    }, messagesEmail.forgetPassword);
     res.json({ msj: 'We send mail with the instructions, please open your email and change password' });
   } catch (error) {
-    console.log(error);
+    const server = new Error('server error');
+    return res.status(403).json({ msj: server.message });
   }
 };
 

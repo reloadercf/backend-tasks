@@ -1,10 +1,9 @@
 import nodemailer from 'nodemailer';
 
-export const emailRegister = async (dataRegister) => {
-  const { email, name, token } = dataRegister;
+const senderEmail = async (data, runTypeEmail) => {
+  const { email } = data;
   const transport = nodemailer.createTransport({
     service: 'gmail',
-    // host: 'smtp.gmail.com',
     port: 587,
     secure: false,
     auth: {
@@ -12,21 +11,13 @@ export const emailRegister = async (dataRegister) => {
       pass: `${process.env.PASSMAIL}`,
     },
   });
-  const info = transport.sendMail({
+  const info = await transport.sendMail({
     from: `${process.env.USERMAIL}`,
     to: email,
-    subject: 'Confirm your account',
+    subject: runTypeEmail(data).subject,
     text: 'If you no are a robot, confirm your account',
-    html: `<p>Hi ${name} we are excited for your register</p>
-    <p>Welcome!</p>
-    <p>For continue please confirm your email.</p>
-    <a href="${process.env.FRONTED}/confirm/${token}" target="_blank">Click here for confirm account</a>
-    <p>If you don't create account with us, please ignore this email</p>
-    `,
+    html: runTypeEmail(data).body,
   });
   console.log(info);
 };
-
-export const emailForget = () => {
-
-};
+export default senderEmail;
