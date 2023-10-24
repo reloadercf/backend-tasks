@@ -107,7 +107,7 @@ const verifyToken = async (req, res) => {
   const { token } = req.params;
   const isValidToken = await User.findOne({ token });
   if (isValidToken) {
-    res.status(200).json({ ms: 'Success' });
+    res.status(200).json({ msj: 'Success' });
   } else {
     const error = new Error('Invalid token');
     return res.status(404).json({ msj: error.message });
